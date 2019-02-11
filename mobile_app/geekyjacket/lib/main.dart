@@ -1,0 +1,446 @@
+/***********************************************************************
+ * 
+ * geekyjacket
+ * 
+ * This version is based on example code from flutter_blue:
+ *   Copyright 2017, Paul DeMarco.
+ *   All rights reserved. Use of this source code is governed by a
+ *   BSD-style license that can be found in the LICENSE file.
+ * 
+ *  For more info, see the flutter_blue package:
+ *   https://pub.dartlang.org/packages/flutter_blue
+ * 
+ */
+
+
+
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
+import 'package:geekyjacket/widgets.dart';
+
+void main() {
+  runApp(new FlutterBlueApp());
+}
+
+
+class FlutterBlueApp extends StatefulWidget {
+  FlutterBlueApp({Key key, this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  _FlutterBlueAppState createState() => new _FlutterBlueAppState();
+}
+
+class _FlutterBlueAppState extends State<FlutterBlueApp> {
+  FlutterBlue _flutterBlue = FlutterBlue.instance;
+
+  /// Scanning
+  StreamSubscription _scanSubscription;
+  Map<DeviceIdentifier, ScanResult> scanResults = new Map();
+  bool isScanning = false;
+
+  /// State
+  StreamSubscription _stateSubscription;
+  BluetoothState state = BluetoothState.unknown;
+
+  /// Device
+  BluetoothDevice device;
+  bool get isConnected => (device != null);
+  StreamSubscription deviceConnection;
+  StreamSubscription deviceStateSubscription;
+  List<BluetoothService> services = new List();
+  Map<Guid, StreamSubscription> valueChangedSubscriptions = {};
+  BluetoothDeviceState deviceState = BluetoothDeviceState.disconnected;
+
+  @override
+  void initState() {
+    super.initState();
+    // Immediately get the state of FlutterBlue
+    _flutterBlue.state.then((s) {
+      setState(() {
+        state = s;
+      });
+    });
+    // Subscribe to state changes
+    _stateSubscription = _flutterBlue.onStateChanged().listen((s) {
+      setState(() {
+        state = s;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _stateSubscription?.cancel();
+    _stateSubscription = null;
+    _scanSubscription?.cancel();
+    _scanSubscription = null;
+    deviceConnection?.cancel();
+    deviceConnection = null;
+    super.dispose();
+  }
+
+  _startScan() {
+    _scanSubscription = _flutterBlue
+        .scan(
+      timeout: const Duration(seconds: 5),
+      /*withServices: [
+          new Guid('0000180F-0000-1000-8000-00805F9B34FB')
+        ]*/
+
+        // Let's use the UART service on the Adafruit Feather M0 Bluefruit.
+        withServices: [
+          new Guid('6E400001-B5A3-F393-­E0A9-­E50E24DCCA9E')
+        ],
+    )
+        .listen((scanResult) {
+      print('localName: ${scanResult.advertisementData.localName}');
+      print(
+          'manufacturerData: ${scanResult.advertisementData.manufacturerData}');
+      print('serviceData: ${scanResult.advertisementData.serviceData}');
+      setState(() {
+        scanResults[scanResult.device.id] = scanResult;
+      });
+    }, onDone: _stopScan);
+
+    setState(() {
+      isScanning = true;
+    });
+  }
+
+  _stopScan() {
+    _scanSubscription?.cancel();
+    _scanSubscription = null;
+    setState(() {
+      isScanning = false;
+    });
+  }
+
+  _connect(BluetoothDevice d) async {
+    device = d;
+    // Connect to device
+    deviceConnection = _flutterBlue
+        .connect(device, timeout: const Duration(seconds: 4))
+        .listen(
+          null,
+          onDone: _disconnect,
+        );
+
+    // Update the connection state immediately
+    device.state.then((s) {
+      setState(() {
+        deviceState = s;
+      });
+    });
+
+    // Subscribe to connection changes
+    deviceStateSubscription = device.onStateChanged().listen((s) {
+      setState(() {
+        deviceState = s;
+      });
+      if (s == BluetoothDeviceState.connected) {
+        device.discoverServices().then((s) {
+          setState(() {
+            services = s;
+          });
+        });
+      }
+    });
+  }
+
+  _disconnect() {
+    // Remove all value changed listeners
+    valueChangedSubscriptions.forEach((uuid, sub) => sub.cancel());
+    valueChangedSubscriptions.clear();
+    deviceStateSubscription?.cancel();
+    deviceStateSubscription = null;
+    deviceConnection?.cancel();
+    deviceConnection = null;
+    setState(() {
+      device = null;
+    });
+  }
+
+  _readCharacteristic(BluetoothCharacteristic c) async {
+    await device.readCharacteristic(c);
+    setState(() {});
+  }
+
+  var wv = [0x4e];
+  
+  writeColor(var colVal) async {
+    wv = [colVal];
+    _writeCharacteristic(wvchar);
+  }
+
+  _writeCharacteristic(BluetoothCharacteristic c) async {
+    await device.writeCharacteristic(c, wv,
+        type: CharacteristicWriteType.withResponse);
+    setState(() {});
+  }
+
+  _readDescriptor(BluetoothDescriptor d) async {
+    await device.readDescriptor(d);
+    setState(() {});
+  }
+
+  _writeDescriptor(BluetoothDescriptor d) async {
+    await device.writeDescriptor(d, [0x12, 0x34]);
+    setState(() {});
+  }
+
+  _setNotification(BluetoothCharacteristic c) async {
+    if (c.isNotifying) {
+      await device.setNotifyValue(c, false);
+      // Cancel subscription
+      valueChangedSubscriptions[c.uuid]?.cancel();
+      valueChangedSubscriptions.remove(c.uuid);
+    } else {
+      await device.setNotifyValue(c, true);
+      // ignore: cancel_subscriptions
+      final sub = device.onValueChanged(c).listen((d) {
+        setState(() {
+          print('onValueChanged $d');
+        });
+      });
+      // Add to map
+      valueChangedSubscriptions[c.uuid] = sub;
+    }
+    setState(() {});
+  }
+
+  _refreshDeviceState(BluetoothDevice d) async {
+    var state = await d.state;
+    setState(() {
+      deviceState = state;
+      print('State refreshed: $deviceState');
+    });
+  }
+
+  // **************************
+  //
+  // UI
+  //
+  //
+
+  _buildScanningButton() {
+    if (isConnected || state != BluetoothState.on) {
+      return null;
+    }
+    if (isScanning) {
+      return new FloatingActionButton(
+        child: new Icon(Icons.stop),
+        onPressed: _stopScan,
+        backgroundColor: Colors.red,
+      );
+    } else {
+      return new FloatingActionButton(
+          child: new Icon(Icons.search), onPressed: _startScan);
+    }
+  }
+
+  _buildScanResultTiles() {
+    return scanResults.values
+        .map((r) => ScanResultTile(
+              result: r,
+              onTap: () => _connect(r.device),
+            ))
+        .toList();
+  }
+
+  var wvchar;
+  List<Widget> _buildServiceTiles() {
+    return services
+        .map(
+          (s) => new ServiceTile(
+                service: s,
+                characteristicTiles: s.characteristics
+                    .map(
+                      (c) => new CharacteristicTile(
+                            characteristic: c,
+                            onReadPressed: () => _readCharacteristic(c),
+                            onWritePressed: ()  {
+                              wvchar = c;
+                              _writeCharacteristic(wvchar);
+                            },
+                            onNotificationPressed: () => _setNotification(c),
+                            descriptorTiles: c.descriptors
+                                .map(
+                                  (d) => new DescriptorTile(
+                                        descriptor: d,
+                                        onReadPressed: () => _readDescriptor(d),
+                                        onWritePressed: () =>
+                                            _writeDescriptor(d),
+                                      ),
+                                )
+                                .toList(),
+                          ),
+                    )
+                    .toList(),
+              ),
+        )
+        .toList();
+  }
+
+  _buildActionButtons() {
+    if (isConnected) {
+      return <Widget>[
+        new IconButton(
+          icon: const Icon(Icons.cancel),
+          onPressed: () => _disconnect(),
+        )
+      ];
+    }
+  }
+
+  _buildAlertTile() {
+    return new Container(
+      color: Colors.redAccent,
+      child: new ListTile(
+        title: new Text(
+          'Bluetooth adapter is ${state.toString().substring(15)}',
+          style: Theme.of(context).primaryTextTheme.subhead,
+        ),
+        trailing: new Icon(
+          Icons.error,
+          color: Theme.of(context).primaryTextTheme.subhead.color,
+        ),
+      ),
+    );
+  }
+
+  _buildDeviceStateTile() {
+    return new ListTile(
+        leading: (deviceState == BluetoothDeviceState.connected)
+            ? const Icon(Icons.bluetooth_connected)
+            : const Icon(Icons.bluetooth_disabled),
+        title: new Text('Device is ${deviceState.toString().split('.')[1]}.'),
+        subtitle: new Text('${device.id}'),
+        trailing: new IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () => _refreshDeviceState(device),
+          color: Theme.of(context).iconTheme.color.withOpacity(0.5),
+        ));
+  }
+
+  _buildProgressBarTile() {
+    return new LinearProgressIndicator();
+  }
+
+  _buildEORaisedButton({color: Color, textColor: Color, signalChar: int, label: String}){
+    return Padding(
+      padding: EdgeInsets.all(8.0),
+      child: RaisedButton(
+        color: color,
+        textColor: textColor,
+        onPressed: () {writeColor(signalChar);},
+        elevation: 3.0,
+        child: Text(label),
+        shape: new RoundedRectangleBorder(borderRadius:BorderRadius.all(Radius.circular(60))),
+        padding: EdgeInsets.fromLTRB(0, 30, 0, 30),
+      )
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var tiles = new List<Widget>();
+    if (state != BluetoothState.on) {
+      tiles.add(_buildAlertTile());
+    }
+    var gjColors = new Row(
+      children: [
+        _buildEORaisedButton(
+          color: Color.fromRGBO(255, 0, 0, 1),
+          textColor: Color.fromRGBO(255,255,255,1),
+          signalChar: 0x72,
+          label: "red"
+        ),
+        _buildEORaisedButton(
+          color: Color.fromRGBO(255,220,0,1),
+          textColor: Color.fromRGBO(0,0,0,1),
+          signalChar: 0x79,
+          label: "yellow"
+        ),
+        _buildEORaisedButton(
+          color: Color.fromRGBO(0,255,0,1),
+          textColor: Color.fromRGBO(0,0,0,1),
+          signalChar: 0x67,
+          label: "green",
+        ),
+      ]
+    );
+    var gjColors2 = new Row(
+
+      children: [
+        _buildEORaisedButton(
+          color: Color.fromRGBO(0,102,255,1),
+          textColor: Color.fromRGBO(255,255,255,1),
+          signalChar: 0x62,
+          label: "blue"
+        ),
+        _buildEORaisedButton(
+          color: Color.fromRGBO(128,128,128,1),
+          textColor: Color.fromRGBO(255,255,255,1),
+          signalChar: 0x61,
+          label: "sparkle"
+        ),
+        _buildEORaisedButton(
+          color: Color.fromRGBO(0,0,0,1),
+          textColor: Color.fromRGBO(255,255,255,1),
+          signalChar: 0x4e,
+          label: "off"
+        ),
+      ]
+    );
+    if (isConnected) {
+      tiles.add(_buildDeviceStateTile());
+      tiles.addAll(_buildServiceTiles());
+      tiles.add(gjColors);
+      tiles.add(gjColors2);
+    } else {
+      tiles.addAll(_buildScanResultTiles());
+    }
+    return new MaterialApp(
+      theme: ThemeData(
+        // Define the default Brightness and Colors
+        brightness: Brightness.dark,
+        primaryColor: Colors.purple[900],
+        accentColor: Colors.purpleAccent[400],
+        
+        // Define the default Font Family
+        // fontFamily: 'Montserrat',
+        
+        // Define the default TextTheme. Use this to specify the default
+        // text styling for headlines, titles, bodies of text, and more.
+        textTheme: TextTheme(
+          headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+          title: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+          body1: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+        ),
+      ),
+      home: new Scaffold(
+        appBar: new AppBar(
+          title: const Text('geekyjacket', style:TextStyle(letterSpacing: 4.0)),
+          actions: _buildActionButtons(),
+        ),
+        floatingActionButton: _buildScanningButton(),
+        body: new Stack(
+          children: <Widget>[
+                (isScanning) ? _buildProgressBarTile() : new Container(),
+                new ListView(
+                  children: tiles,
+                  
+                ),
+                
+                
+              ]
+            )
+          
+        ),
+      );
+  }
+}
