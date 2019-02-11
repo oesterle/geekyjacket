@@ -13,4 +13,4 @@ We plan to simplify this process in future iterations.
 
 ![screen 4](https://github.com/oesterle/geekyjacket/raw/master/docs/gj_screen_4.png "screen 4")
 
-![screen 5](https://github.com/oesterle/geekyjacket/raw/master/docs/gj_screen_4.png "screen 5")
+![screen 5](https://github.com/oesterle/geekyjacket/raw/master/docs/gj_screen_5.png "screen 5")
