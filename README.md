@@ -3,7 +3,7 @@
 # geekyjacket
 ### Adding Flutter to clothing
 
-Made at [DevCamp](https://devca.mp), February 1-3, 2019. Winner for [“Coolest Hack.”](https://devca.mp/unleashing-the-heroes-f48a241f72a6)
+Made at [DevCamp](https://devca.mp), February 1-3, 2019, by Eric Oesterle & Neil Heather. Winner for [“Coolest Hack.”](https://devca.mp/unleashing-the-heroes-f48a241f72a6)
 
 A project connecting a mobile [Flutter](https://flutter.io) app to wearables via Bluetooth LE.
 
