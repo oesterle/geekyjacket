@@ -5,6 +5,9 @@
 
 Made at [DevCamp](https://devca.mp), February 1-3, 2019, by Eric Oesterle & Neil Heather. Winner for [“Coolest Hack.”](https://devca.mp/unleashing-the-heroes-f48a241f72a6)
 
+![demo](https://github.com/oesterle/geekyjacket/raw/master/docs/gj_demo_vid.gif "demo")  
+[Watch a longer clip of the demo](https://twitter.com/erico/status/1092261259544674304)
+
 A project connecting a mobile [Flutter](https://flutter.io) app to wearables via Bluetooth LE.
 
 Uses the [flutter_blue](https://pub.dartlang.org/packages/flutter_blue) plugin to connect with an [Adafruit Feather M0 Bluefruit](https://www.adafruit.com/product/2995) microcontroller.
