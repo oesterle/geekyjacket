@@ -19,13 +19,21 @@
 Be sure to set up the Arduino IDE for use with the Feather. Follow the instructions in the [product guide](https://learn.adafruit.com/adafruit-feather-m0-bluefruit-le/overview) for installing the **board support package** and the **Bluefruit library**.
 
 ### Soldering the NeoPixel LED strip
-Locate the input end of the NeoPixel LED strip – arrows on the strip face *away* from this end. Solder the ground to the Feather GND, 5V on strip to the BAT on the Feather, and strip's Din to Feather's pin 6.
+Locate the input end of the NeoPixel LED strip – arrows on the strip point *away* from this end. Solder the connections:
+
+NeoPixel strip | Feather
+-------------- | -------------
+Gnd            | Gnd
++5V            | Bat
+Din            | Pin 6
 
 For more durability, use flexible silicone wire to connect to the Feather. A good choice would be Adafruit's [Silicone Cover Stranded-Core Ribbon Cable - 4 Wires 1 Meter Long - 26AWG Black](https://www.adafruit.com/product/3892).  
 ![schematic](https://github.com/oesterle/geekyjacket/raw/master/materials_and_construction/gj_schematic_bb_1024px_b.jpg "schematic")
 
 ### Powering the MCU and LEDs
 For the animations in our demo, which light a maximum of 10 LEDs at a time, we use Adafruit's [Lithium Ion Cylindrical Battery - 3.7v 2200mAh](https://www.adafruit.com/product/1781). NeoPixel LEDs can use 60mA each on full brightness. For 10 LEDs on at full brightness, this would require about 600mA current draw. See the (NeoPixel Überguide)[https://learn.adafruit.com/adafruit-neopixel-uberguide/the-magic-of-neopixels] for more info on powering LED strips.
+
+Also, you'll note that we are power the strip from the ~3.7V battery, rather than its 5V rated power. This is fairly common in mobile projects, and exploits the WS2812B tolerance for somewhat lower voltage.
 
 ### Testing
 Test the MCU and strip before sewing into the jacket sleeve.
