@@ -31,9 +31,9 @@ For more durability, use flexible silicone wire to connect to the Feather. A goo
 ![schematic](https://github.com/oesterle/geekyjacket/raw/master/materials_and_construction/gj_schematic_bb_1024px_b.jpg "schematic")
 
 ### Powering the MCU and LEDs
-For the animations in our demo, which light a maximum of 10 LEDs at a time, we use Adafruit's [Lithium Ion Cylindrical Battery - 3.7v 2200mAh](https://www.adafruit.com/product/1781). NeoPixel LEDs can use 60mA each on full brightness. For 10 LEDs on at full brightness, this would require about 600mA current draw. See the (NeoPixel Überguide)[https://learn.adafruit.com/adafruit-neopixel-uberguide/the-magic-of-neopixels] for more info on powering LED strips.
+For the animations in our demo, which light a maximum of 10 LEDs at a time, we use Adafruit's [Lithium Ion Cylindrical Battery - 3.7v 2200mAh](https://www.adafruit.com/product/1781). NeoPixel LEDs can use 60mA each on full brightness. For 10 LEDs on at full brightness, this would require about 600mA current draw. See the [NeoPixel Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide/the-magic-of-neopixels) for more info on powering LED strips.
 
-Also, you'll note that we are power the strip from the ~3.7V battery, rather than its 5V rated power. This is fairly common in mobile projects, and exploits the WS2812B tolerance for somewhat lower voltage.
+Also, you'll note that we are power the strip from the ~3.7V battery, rather than its 5V rated power. This is fairly common in wearable projects, and exploits the WS2812B tolerance for somewhat lower voltage.
 
 ### Testing
 Test the MCU and strip before sewing into the jacket sleeve.
