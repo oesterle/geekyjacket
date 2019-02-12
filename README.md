@@ -15,9 +15,9 @@ Uses the [flutter_blue](https://pub.dartlang.org/packages/flutter_blue) plugin t
 ### Project structure
 **[mobile_app](https://github.com/oesterle/geekyjacket/tree/master/mobile_app)** contains the Flutter project. We used VS Code to build. We've only tested the project on iOS so far. See **[docs](https://github.com/oesterle/geekyjacket/tree/master/docs)** for how to connect to and control geekyjacket from your phone.
 
-**[firmware](https://github.com/oesterle/geekyjacket/tree/master/firmware)** contains Arduino code. Be sure to install the board support package for your microcontroller. See the product guide for your MCU. For the [Adafruit Feather M0 Bluefruit](https://www.adafruit.com/product/2995), its this [product guide](https://learn.adafruit.com/adafruit-feather-m0-bluefruit-le/overview).
+**[firmware](https://github.com/oesterle/geekyjacket/tree/master/firmware)** contains Arduino code for the LEDs and the tiny tiny computer in your jacket. Be sure to install the board support package for your microcontroller. See the product guide for your MCU. For the [Adafruit Feather M0 Bluefruit](https://www.adafruit.com/product/2995), its this [product guide](https://learn.adafruit.com/adafruit-feather-m0-bluefruit-le/overview).
 
-**[materials_and_construction](https://github.com/oesterle/geekyjacket/tree/master/materials_and_construction)** includes the list of materials, and will guide you through assembling the project and integrating it into the jacket sleeve.
+**[materials_and_construction](https://github.com/oesterle/geekyjacket/tree/master/materials_and_construction)** includes the list of materials, and will guide you through assembling the project and sewing it into the jacket sleeve. Don't sew, or in a hurry to make a low-fi prototype? We show you how to cheat with fabric tape.
 
 ### Running the app
 See the annotated screenshots in the **[docs](https://github.com/oesterle/geekyjacket/tree/master/docs)** folder for
