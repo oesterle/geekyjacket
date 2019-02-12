@@ -1,7 +1,7 @@
 ![geekyjacket logo](https://github.com/oesterle/geekyjacket/raw/master/docs/logo.png "geekyjacket logo")
 
 # geekyjacket
-### Adding Flutter to clothing
+### Animate LEDs on your jacket with a Flutter app
 
 Made at [DevCamp](https://devca.mp), February 1-3, 2019, by Eric Oesterle & Neil Heather. Winner for [“Coolest Hack.”](https://devca.mp/unleashing-the-heroes-f48a241f72a6)
 
