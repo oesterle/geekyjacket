@@ -1,9 +1,9 @@
-![geekyjacket logo](https://github.com/oesterle/geekyjacket/raw/master/docs/logo.png "geekyjacket logo")
+![geekyjacket banner](https://github.com/oesterle/geekyjacket/raw/master/docs/banner_big.png "geekyjacket banner")
 
 # geekyjacket
 ### Animate LEDs on your jacket with a Flutter app
 
-Made at [DevCamp](https://devca.mp), February 1-3, 2019, by Eric Oesterle & Neil Heather. Winner for [“Coolest Hack.”](https://devca.mp/unleashing-the-heroes-f48a241f72a6)
+Made at [DevCamp](https://devca.mp), February 1-3, 2019, by [Eric Oesterle](https://www.linkedin.com/in/ericoesterle/) & [Neil Heather](https://www.linkedin.com/in/neilheather/). Winner for [“Coolest Hack.”](https://devca.mp/unleashing-the-heroes-f48a241f72a6)
 
 ![demo](https://github.com/oesterle/geekyjacket/raw/master/docs/gj_demo_vid.gif "demo")  
 [Watch a longer clip of the demo](https://twitter.com/erico/status/1092261259544674304)
