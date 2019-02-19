@@ -259,11 +259,15 @@ class _FlutterBlueAppState extends State<FlutterBlueApp> {
                 service: s,
                 characteristicTiles: s.characteristics
                     .map(
-                      (c) => new CharacteristicTile(
+                      (c) {
+                        if (c.uuid.toString() == "6e400002-b5a3-f393-e0a9-e50e24dcca9e"){
+                          print("found UART write characteristic: " + c.uuid.toString());
+                          wvchar = c;
+                        }
+                        return CharacteristicTile(
                             characteristic: c,
                             onReadPressed: () => _readCharacteristic(c),
-                            onWritePressed: ()  {
-                              wvchar = c;
+                            onWritePressed: () {
                               _writeCharacteristic(wvchar);
                             },
                             onNotificationPressed: () => _setNotification(c),
@@ -277,7 +281,8 @@ class _FlutterBlueAppState extends State<FlutterBlueApp> {
                                       ),
                                 )
                                 .toList(),
-                          ),
+                          );
+                        }
                     )
                     .toList(),
               ),
@@ -349,17 +354,21 @@ class _FlutterBlueAppState extends State<FlutterBlueApp> {
             Positioned(
               top: 29,
               width: 80,
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: textColor,
-                  fontWeight: FontWeight.w700,
+              child: GestureDetector(
+                onTap: () {writeColor(signalChar);},
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  textScaleFactor: 1.2,
+                  softWrap: false,
+                  textAlign: TextAlign.center,
                 ),
-                textScaleFactor: 1.2,
-                softWrap: false,
-                textAlign: TextAlign.center,
               ),
-            ),
+              
+            )
           ],
         )
       )
