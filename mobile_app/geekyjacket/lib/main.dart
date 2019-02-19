@@ -332,15 +332,36 @@ class _FlutterBlueAppState extends State<FlutterBlueApp> {
 
   _buildEORaisedButton({color: Color, textColor: Color, signalChar: int, label: String}){
     return Padding(
-      padding: EdgeInsets.all(8.0),
-      child: RaisedButton(
-        color: color,
-        textColor: textColor,
-        onPressed: () {writeColor(signalChar);},
-        elevation: 3.0,
-        child: Text(label),
-        shape: new RoundedRectangleBorder(borderRadius:BorderRadius.all(Radius.circular(60))),
-        padding: EdgeInsets.fromLTRB(0, 30, 0, 30),
+      padding: EdgeInsets.fromLTRB(0,0,0,10),
+      child: SizedBox(
+        width: 80,
+        height: 80,
+        child: Stack(
+          fit:StackFit.expand,
+          children: <Widget>[
+            RaisedButton(
+              color: color,
+              textColor: textColor,
+              onPressed: () {writeColor(signalChar);},
+              elevation: 3.0,
+              shape: CircleBorder(),
+            ),
+            Positioned(
+              top: 29,
+              width: 80,
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.w700,
+                ),
+                textScaleFactor: 1.2,
+                softWrap: false,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        )
       )
     );
   }
@@ -351,46 +372,42 @@ class _FlutterBlueAppState extends State<FlutterBlueApp> {
     if (state != BluetoothState.on) {
       tiles.add(_buildAlertTile());
     }
-    var gjColors = new Row(
+    var gjColors = new Wrap(
+      spacing: 8.0,
       children: [
         _buildEORaisedButton(
-          color: Color.fromRGBO(255, 0, 0, 1),
-          textColor: Color.fromRGBO(255,255,255,1),
+          color: Colors.redAccent[400],
+          textColor: Colors.white,
           signalChar: 0x72,
           label: "red"
         ),
         _buildEORaisedButton(
-          color: Color.fromRGBO(255,220,0,1),
-          textColor: Color.fromRGBO(0,0,0,1),
+          color: Colors.yellowAccent[400],
+          textColor: Colors.black,
           signalChar: 0x79,
           label: "yellow"
         ),
         _buildEORaisedButton(
-          color: Color.fromRGBO(0,255,0,1),
-          textColor: Color.fromRGBO(0,0,0,1),
+          color: Colors.lightGreenAccent[400],
+          textColor: Colors.black,
           signalChar: 0x67,
           label: "green",
         ),
-      ]
-    );
-    var gjColors2 = new Row(
-
-      children: [
         _buildEORaisedButton(
-          color: Color.fromRGBO(0,102,255,1),
-          textColor: Color.fromRGBO(255,255,255,1),
+          color: Colors.blue,
+          textColor: Colors.white,
           signalChar: 0x62,
           label: "blue"
         ),
         _buildEORaisedButton(
-          color: Color.fromRGBO(128,128,128,1),
-          textColor: Color.fromRGBO(255,255,255,1),
+          color: Colors.grey[600],
+          textColor: Colors.white,
           signalChar: 0x61,
           label: "sparkle"
         ),
         _buildEORaisedButton(
-          color: Color.fromRGBO(0,0,0,1),
-          textColor: Color.fromRGBO(255,255,255,1),
+          color: Colors.black,
+          textColor: Colors.white,
           signalChar: 0x4e,
           label: "off"
         ),
@@ -400,7 +417,6 @@ class _FlutterBlueAppState extends State<FlutterBlueApp> {
       tiles.add(_buildDeviceStateTile());
       tiles.addAll(_buildServiceTiles());
       tiles.add(gjColors);
-      tiles.add(gjColors2);
     } else {
       tiles.addAll(_buildScanResultTiles());
     }
